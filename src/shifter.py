@@ -10,6 +10,7 @@ without any warranty.
 """
 
 import argparse
+import random
 import sys
 import csv
 
@@ -19,11 +20,16 @@ if(__name__ == "__main__"):
                         type=argparse.FileType('r'),
                         help='People CSV')
     parser.add_argument('works',
-                        type=argparse.FileType('r'),                
+                        type=argparse.FileType('r'),
                         help='Works CSV.')
+    parser.add_argument('--retry',
+                        type=int,
+                        default=5,
+                        help='Aborts when we cannot assign any jobs in last (retry count) iterations')
     args = parser.parse_args()
 
-    people = []
+    people = {}
+    assign_result = {}
     people_csv = csv.reader(args.people)
     for row in people_csv:
         tmp = []
@@ -34,12 +40,11 @@ if(__name__ == "__main__"):
             except NameError:
                 val = c
             tmp.append(val)
-        people.append({
-            'id' : tmp[0],
+        people[tmp[0]] = {
             'white_list' : tmp[1],
-            'service_time' : tmp[2]
-        })
-    print(people)
+            'time' : tmp[2]
+        }
+        assign_result[tmp[0]] = []
 
     works = []
     works_csv = csv.reader(args.works)
@@ -52,40 +57,49 @@ if(__name__ == "__main__"):
             except Exception:
                 val = c
             tmp.append(val)
-        """
-        to feed `works_bad.csv', use this script:
-        job_tmp = []
-        for t in [i / 2 for i in range(18, 35)]:
-            if(tmp[3] <= t and t < tmp[4]):
-                job_tmp.append(1)
-            else:
-                job_tmp.append(0)
-        works.append([
-            tmp[0],
-            tmp[1],
-            tmp[2],
-            job_tmp,
-        })
-        """
         works.append({
             'id' : tmp[0],
             'type' : tmp[1],
             'label' : tmp[2],
-            'job_time' : tmp[3],
+            'time' : tmp[3],
         })
-    print(works)
 
-    for w in works:
-        job_time = w['job_time']
-        matched = None
-        for p in people:
-            is_matched = (all(map(
-                lambda x,y: (x==1 and x==y) or x==0,
-                job_time,
-                p['service_time']
-            )))
-            if(is_matched):
-                matched = p
-                break
-        print(matched)
+    unassigned_works = [len(works)]
 
+    while(unassigned_works[-1] > 0):
+        for pid in people:
+            p = people[pid]
+            picked_work = None
+            for w in works:
+                is_free_time = all(map(
+                    lambda w,p: (w == 1 and p == 1) or (w == 0),
+                    w['time'],
+                    p['time']
+                ))
+                if(is_free_time and w['type'] in p['white_list']):
+                    picked_work = w
+            if(picked_work != None):
+                p['time'] = list(map(
+                    lambda w,p: 0 if w==1 else p,
+                    picked_work['time'],
+                    p['time']
+                ))
+                assign_result[pid].append(picked_work)
+                works.remove(picked_work)
+
+        random.shuffle(works)
+
+        unassigned_works.append(len(works))
+        if(len(unassigned_works)>args.retry and all([ v == unassigned_works[-args.retry] for v in unassigned_works[-(args.retry-1):]])):
+            print(str(unassigned_works[-1])+' job(s) remeins but NO MORE FREE PEOPLE. ABORT.', file=sys.stderr)
+            break
+
+    for pid in assign_result.keys():
+        print(pid, end='')
+        timetable = people[pid]['time']
+        for w in assign_result[pid]:
+            for (i, j) in enumerate(w['time']):
+                timetable[i] = w['id']*-1 if (j == 1) else timetable[i]
+        for wid in timetable:
+            print(','+str(wid), end='')
+        print()
