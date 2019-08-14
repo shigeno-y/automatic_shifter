@@ -41,8 +41,8 @@ if(__name__ == "__main__"):
                 val = c
             tmp.append(val)
         people[tmp[0]] = {
-            'white_list' : tmp[1],
-            'time' : tmp[2]
+            'white_list': tmp[1],
+            'time': tmp[2]
         }
         assign_result[tmp[0]] = []
 
@@ -58,10 +58,10 @@ if(__name__ == "__main__"):
                 val = c
             tmp.append(val)
         works.append({
-            'id' : tmp[0],
-            'type' : tmp[1],
-            'label' : tmp[2],
-            'time' : tmp[3],
+            'id': tmp[0],
+            'type': tmp[1],
+            'label': tmp[2],
+            'time': tmp[3],
         })
 
     unassigned_works = [len(works)]
@@ -72,7 +72,7 @@ if(__name__ == "__main__"):
             picked_work = None
             for w in works:
                 is_free_time = all(map(
-                    lambda w,p: (w == 1 and p == 1) or (w == 0),
+                    lambda w, p: (w == 1 and p == 1) or (w == 0),
                     w['time'],
                     p['time']
                 ))
@@ -80,7 +80,7 @@ if(__name__ == "__main__"):
                     picked_work = w
             if(picked_work != None):
                 p['time'] = list(map(
-                    lambda w,p: 0 if w==1 else p,
+                    lambda w, p: 0 if w == 1 else p,
                     picked_work['time'],
                     p['time']
                 ))
@@ -90,8 +90,9 @@ if(__name__ == "__main__"):
         random.shuffle(works)
 
         unassigned_works.append(len(works))
-        if(len(unassigned_works)>args.retry and all([ v == unassigned_works[-args.retry] for v in unassigned_works[-(args.retry-1):]])):
-            print(str(unassigned_works[-1])+' job(s) remeins but NO MORE FREE PEOPLE. ABORT.', file=sys.stderr)
+        if(len(unassigned_works) > args.retry and all([v == unassigned_works[-args.retry] for v in unassigned_works[-(args.retry-1):]])):
+            print(str(
+                unassigned_works[-1])+' job(s) remeins but NO MORE FREE PEOPLE. ABORT.', file=sys.stderr)
             break
 
     for pid in assign_result.keys():

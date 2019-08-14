@@ -10,23 +10,22 @@ without any warranty.
 """
 
 import argparse
-import sys
 import csv
 
 if(__name__ == "__main__"):
-    def p_id(pid:int):
+    def p_id(pid: int):
         return pid+5000
 
-    def w_start_id(wid:int):
+    def w_start_id(wid: int):
         return wid+1000
 
-    def w_end_id(base_wid:int):
+    def w_end_id(base_wid: int):
         return base_wid+3000
 
-    def w_conflict_group_id(base_wid:int):
+    def w_conflict_group_id(base_wid: int):
         return base_wid+2000
 
-    def peg_id(pid:int, gid:int):
+    def peg_id(pid: int, gid: int):
         return pid*10000+gid+1
 
     parser = argparse.ArgumentParser(description="automatic shifter")
@@ -50,9 +49,9 @@ if(__name__ == "__main__"):
                 val = c
             tmp.append(val)
         people[tmp[0]] = {
-            'id' : tmp[0],
-            'white_list' : tmp[1],
-            'time' : tmp[2]
+            'id': tmp[0],
+            'white_list': tmp[1],
+            'time': tmp[2]
         }
     pidMapping = sorted(people.keys())
 
@@ -68,10 +67,10 @@ if(__name__ == "__main__"):
                 val = c
             tmp.append(val)
         works[tmp[0]] = {
-            'id' : tmp[0],
-            'type' : tmp[1],
-            'label' : tmp[2],
-            'time' : tmp[3],
+            'id': tmp[0],
+            'type': tmp[1],
+            'label': tmp[2],
+            'time': tmp[3],
         }
 
     # SMT-LIBに必要な情報を出力しておく
@@ -92,7 +91,8 @@ if(__name__ == "__main__"):
     print('; declare variables')
     for w in works.values():
         print('(declare-const w{0} Int)'.format(w['id']))
-        print('(assert (and (<= 0 w{0}) (<= w{0} {1}) ))'.format(w['id'], len(pidMapping)+1))
+        print('(assert (and (<= 0 w{0}) (<= w{0} {1}) ))'.format(
+            w['id'], len(pidMapping)+1))
     print()
 
     # 時間的に競合する作業は同時に1つまで
@@ -102,10 +102,10 @@ if(__name__ == "__main__"):
         conflicts = []
         for t in tmp:
             is_conflict = any(map(
-                    lambda w,p: (w == 1 and p == 1),
-                    w['time'],
-                    t['time']
-                ))
+                lambda w, p: (w == 1 and p == 1),
+                w['time'],
+                t['time']
+            ))
             if(is_conflict):
                 conflicts.append(t)
                 print('(assert (not (= w{0} w{1})))'.format(w['id'], t['id']))
@@ -118,18 +118,20 @@ if(__name__ == "__main__"):
     for p in people.values():
         for w in works.values():
             is_free_time = all(map(
-                    lambda w,p: (w == 1 and p == 1) or (w == 0),
-                    w['time'],
-                    p['time']
-                ))
+                lambda w, p: (w == 1 and p == 1) or (w == 0),
+                w['time'],
+                p['time']
+            ))
             if(not (is_free_time and w['type'] in p['white_list'])):
-                print('(assert (not (= w{0} {1})))'.format(w['id'], pidMapping.index(p['id'])+1))
+                print('(assert (not (= w{0} {1})))'.format(
+                    w['id'], pidMapping.index(p['id'])+1))
     print()
 
-    print('(maximize (+ ' + ' '.join(['(binarize w{0})'.format(wid) for wid in works.keys()]) + '))')
+    print('(maximize (+ ' +
+          ' '.join(['(binarize w{0})'.format(wid) for wid in works.keys()]) + '))')
 
     print('(check-sat)')
-    #print('(get-model)')
-    print('(get-value (' + ' '.join(['w{0}'.format(wid) for wid in works.keys()]) + '))')
+    # print('(get-model)')
+    print(
+        '(get-value (' + ' '.join(['w{0}'.format(wid) for wid in works.keys()]) + '))')
     print('(exit)')
-

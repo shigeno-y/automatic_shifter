@@ -10,26 +10,10 @@ without any warranty.
 """
 
 import argparse
-import sys
 import csv
 from collections import defaultdict
 
 if(__name__ == "__main__"):
-    def p_id(pid:int):
-        return pid+5000
-
-    def w_start_id(wid:int):
-        return wid+1000
-
-    def w_end_id(base_wid:int):
-        return base_wid+3000
-
-    def w_conflict_group_id(base_wid:int):
-        return base_wid+2000
-
-    def peg_id(pid:int, gid:int):
-        return pid*10000+gid+1
-
     parser = argparse.ArgumentParser(description="automatic shifter")
     parser.add_argument('people',
                         type=argparse.FileType('r'),
@@ -51,9 +35,9 @@ if(__name__ == "__main__"):
                 val = c
             tmp.append(val)
         people[tmp[0]] = {
-            'id' : tmp[0],
-            'white_list' : tmp[1],
-            'time' : tmp[2]
+            'id': tmp[0],
+            'white_list': tmp[1],
+            'time': tmp[2]
         }
     pidMapping = sorted(people.keys())
 
@@ -69,10 +53,10 @@ if(__name__ == "__main__"):
                 val = c
             tmp.append(val)
         works[tmp[0]] = {
-            'id' : tmp[0],
-            'type' : tmp[1],
-            'label' : tmp[2],
-            'time' : tmp[3],
+            'id': tmp[0],
+            'type': tmp[1],
+            'label': tmp[2],
+            'time': tmp[3],
         }
 
     # 時間的に競合する作業は同時に1つまで
@@ -82,14 +66,15 @@ if(__name__ == "__main__"):
         conflicts = []
         for t in tmp:
             is_conflict = any(map(
-                    lambda w,p: (w == 1 and p == 1),
-                    w['time'],
-                    t['time']
-                ))
+                lambda w, p: (w == 1 and p == 1),
+                w['time'],
+                t['time']
+            ))
             if(is_conflict):
                 conflicts.append(t)
-                #conflict_works[w['id']].append(t['id'])
-                conflict_works.add( (min(w['id'], t['id']), max(w['id'], t['id'])) )
+                # conflict_works[w['id']].append(t['id'])
+                conflict_works.add(
+                    (min(w['id'], t['id']), max(w['id'], t['id'])))
         tmp.append(w)
 
     # ホワイトリストにない作業・本人がいない時間帯は絶対ダメ
@@ -97,10 +82,10 @@ if(__name__ == "__main__"):
     for p in people.values():
         for w in works.values():
             is_free_time = all(map(
-                    lambda x,y: (x == 1 and y == 1) or (x == 0),
-                    w['time'],
-                    p['time']
-                ))
+                lambda x, y: (x == 1 and y == 1) or (x == 0),
+                w['time'],
+                p['time']
+            ))
             if(is_free_time and w['type'] in p['white_list']):
                 candidate_wx_y[w['id']].append(p['id'])
 
@@ -122,9 +107,9 @@ if(__name__ == "__main__"):
     for pid in people.keys():
         for (x, y) in conflict_works:
             if (pid in candidate_wx_y[x] and pid in candidate_wx_y[y]):
-                buffering.append('-{0} -{1} 0'.format(x*1000 + pid, y*1000 + pid))
+                buffering.append(
+                    '-{0} -{1} 0'.format(x*1000 + pid, y*1000 + pid))
                 max_var_id = max(max_var_id, y*1000 + pid)
 
     print('p cnf {0} {1}'.format(max_var_id, len(buffering)))
     print('\n'.join(buffering))
-

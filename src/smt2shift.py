@@ -16,7 +16,8 @@ import argparse
 import csv
 
 if(__name__ == "__main__"):
-    parser = argparse.ArgumentParser(description="SMTLIB2Sudoku\n数独の解答を読みやすく変換します")
+    parser = argparse.ArgumentParser(
+        description="SMTLIB2Sudoku\n数独の解答を読みやすく変換します")
     parser.add_argument('people',
                         type=argparse.FileType('r'),
                         help='People CSV')
@@ -42,9 +43,9 @@ if(__name__ == "__main__"):
                 val = c
             tmp.append(val)
         people[tmp[0]] = {
-            'id' : tmp[0],
-            'white_list' : tmp[1],
-            'time' : tmp[2]
+            'id': tmp[0],
+            'white_list': tmp[1],
+            'time': tmp[2]
         }
     pidMapping = sorted(people.keys())
 
@@ -60,10 +61,10 @@ if(__name__ == "__main__"):
                 val = c
             tmp.append(val)
         works[tmp[0]] = {
-            'id' : tmp[0],
-            'type' : tmp[1],
-            'label' : tmp[2],
-            'time' : tmp[3],
+            'id': tmp[0],
+            'type': tmp[1],
+            'label': tmp[2],
+            'time': tmp[3],
         }
 
     assign_result = defaultdict(list)

@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # coding=utf-8
 """
-Copyright 2019
-SHIGENO Yoshitaka <shigeno@coop.nagoya-u.ac.jp>
+Copyright 2019 SHIGENO Yoshitaka <shigeno@coop.nagoya-u.ac.jp>
 
 Copying and distribution of this file, with or without modification,
 are permitted in any medium without royalty provided the copyright
@@ -42,9 +41,9 @@ if(__name__ == "__main__"):
                 val = c
             tmp.append(val)
         people[tmp[0]] = {
-            'id' : tmp[0],
-            'white_list' : tmp[1],
-            'time' : tmp[2]
+            'id': tmp[0],
+            'white_list': tmp[1],
+            'time': tmp[2]
         }
     pidMapping = sorted(people.keys())
 
@@ -60,10 +59,10 @@ if(__name__ == "__main__"):
                 val = c
             tmp.append(val)
         works[tmp[0]] = {
-            'id' : tmp[0],
-            'type' : tmp[1],
-            'label' : tmp[2],
-            'time' : tmp[3],
+            'id': tmp[0],
+            'type': tmp[1],
+            'label': tmp[2],
+            'time': tmp[3],
         }
 
     assign_result = defaultdict(list)
@@ -83,9 +82,9 @@ if(__name__ == "__main__"):
 
     for s in instrings:
         s = int(s)
-        if(s>0):
+        if(s > 0):
             w = s//1000
-            p = s%1000
+            p = s % 1000
             assign_result[p].append(works[w])
 
     for pid in assign_result.keys():

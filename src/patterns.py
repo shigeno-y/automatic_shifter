@@ -11,8 +11,6 @@ without any warranty.
 
 import argparse
 from functools import reduce
-import random
-import sys
 import csv
 
 if(__name__ == "__main__"):
@@ -36,10 +34,10 @@ if(__name__ == "__main__"):
         works.append(tmp[3])
 
     for p in set(map(
-        lambda x: reduce(lambda a,b: a*2+b, x),
+        lambda x: reduce(lambda a, b: a*2+b, x),
         works
     )):
         tmp = []
         for i in range(17):
-            tmp.insert(0, 1 if (p&(1<<i)) else 0)
+            tmp.insert(0, 1 if (p & (1 << i)) else 0)
         print(tmp)

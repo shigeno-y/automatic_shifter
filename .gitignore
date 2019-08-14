@@ -1,11 +1,2 @@
-bin/
-bin
-lib/
-lib
-lib64/
-lib64
-share/
-pyvenv.cfg
-
 *.xlsx
 __pycache__/
