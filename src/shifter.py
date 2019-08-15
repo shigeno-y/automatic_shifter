@@ -25,8 +25,9 @@ if(__name__ == "__main__"):
     parser.add_argument('--retry',
                         type=int,
                         default=5,
-                        help='Aborts when we cannot assign any jobs in last (retry count) iterations')
+                        help='Aborts when we complete in n iterations')
     args = parser.parse_args()
+    retry = args.retry
 
     people = {}
     assign_result = {}
@@ -78,7 +79,7 @@ if(__name__ == "__main__"):
                 ))
                 if(is_free_time and w['type'] in p['white_list']):
                     picked_work = w
-            if(picked_work != None):
+            if(picked_work is not None):
                 p['time'] = list(map(
                     lambda w, p: 0 if w == 1 else p,
                     picked_work['time'],
@@ -90,9 +91,12 @@ if(__name__ == "__main__"):
         random.shuffle(works)
 
         unassigned_works.append(len(works))
-        if(len(unassigned_works) > args.retry and all([v == unassigned_works[-args.retry] for v in unassigned_works[-(args.retry-1):]])):
-            print(str(
-                unassigned_works[-1])+' job(s) remeins but NO MORE FREE PEOPLE. ABORT.', file=sys.stderr)
+        if(len(unassigned_works) > retry and
+           all([v == unassigned_works[-retry]
+                for v in unassigned_works[-(retry-1):]])):
+            print(str(unassigned_works[-1])
+                  + ' job(s) remeins but NO MORE FREE PEOPLE.',
+                  file=sys.stderr)
             break
 
     for pid in assign_result.keys():
