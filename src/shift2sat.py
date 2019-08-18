@@ -73,8 +73,7 @@ if(__name__ == "__main__"):
             if(is_conflict):
                 conflicts.append(t)
                 # conflict_works[w['id']].append(t['id'])
-                conflict_works.add(
-                    (min(w['id'], t['id']), max(w['id'], t['id'])))
+                conflict_works.add((w['id'], t['id']))
         tmp.append(w)
 
     # ホワイトリストにない作業・本人がいない時間帯は絶対ダメ
@@ -105,7 +104,9 @@ if(__name__ == "__main__"):
 
     # 時間的に競合する作業は同時に1つまで
     for pid in people.keys():
-        for (x, y) in conflict_works:
+        for (p, q) in conflict_works:
+            x = min(p, q)
+            y = max(p, q)
             if (pid in candidate_wx_y[x] and pid in candidate_wx_y[y]):
                 buffering.append(
                     '-{0} -{1} 0'.format(x*1000 + pid, y*1000 + pid))
